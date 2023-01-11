@@ -22,7 +22,7 @@
     (let loop ((t tree) (r empty-tree))
       (cond ((empty-tree? t) (reverse-tree r))
             ((tree? (first t)) (loop (others t) (loop (first t) empty-tree)))
-            (else (loop (others t) (if (pred (first t)) (add-to-tree (first t) r) r)))))
+            (else (loop (others t) (if (pred (first t)) (add-to-tree (first t) r) r)))))))
 ;;transducers
 (define map-leaves
   (lambda (tree proc)
