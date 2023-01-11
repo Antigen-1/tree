@@ -19,11 +19,17 @@
 ;;filter
 (define filter-leaves
   (lambda (tree pred)
-    (reverse-tree (accumulate-leaves tree (lambda (item new) (if (tree? item) (add-to-tree (filter-leaves item pred) new) (if (pred item) (add-to-tree item new) new))) empty-tree))))
+    (let loop ((t tree) (r empty-tree))
+      (cond ((empty-tree? t) (reverse-tree r))
+            ((tree? (first t)) (loop (others t) (loop (first t) empty-tree)))
+            (else (loop (others t) (if (pred (first t)) (add-to-tree (first t) r) r)))))
 ;;transducers
 (define map-leaves
-  (lambda (tree proc) 
-    (reverse-tree (accumulate-leaves tree (lambda (item new) (add-to-tree (if (tree? item) (map-leaves item proc) (proc item)) new)) empty-tree))))
+  (lambda (tree proc)
+    (let loop ((t tree) (r empty-tree))
+      (cond ((empty-tree? t) (reverse-tree r))
+            ((tree? (first t)) (loop (others t) (loop (first t) empty-tree)))
+            (else (loop (others t) (add-to-tree (proc (first t)) r)))))))
 (define select-and-map-leaves
   (lambda (tree proc pred)
     (map-leaves tree (lambda (leaf) (if (pred leaf) (proc leaf) leaf)))))
