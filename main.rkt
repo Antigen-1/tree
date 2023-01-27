@@ -37,6 +37,8 @@
       (cond ((empty-tree? t) (reverse-tree r))
             ((tree? (first t)) (loop (others t) (add-to-tree (loop (first t) empty-tree) r)))
             (else (loop (others t) (add-to-tree (proc (first t)) r)))))))
+(define andmap-leaves (lambda (tree proc)
+                        (let/cc ret (map-leaves tree (lambda (l) (cond ((proc l)) (else (ret #f))))))))
 (define select-and-map-leaves
   (lambda (tree proc pred)
     (map-leaves tree (lambda (leaf) (if (pred leaf) (proc leaf) leaf)))))
