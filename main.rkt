@@ -16,6 +16,13 @@
       (cond ((empty-tree? t) r)
             ((tree? (first t)) (loop (others t) (loop (first t) r)))
             (else (loop (others t) (op (first t) r)))))))
+(define accumulate-leaves-with-depth
+  (lambda (tree op init)
+    (let loop ((t tree) (r init) (d 0))
+      (cond ((empty-tree? t) r)
+            ((tree? (first t))
+             (loop (others t) (loop (first t) r (add1 d)) d))
+            (else (loop (others t) (op (first t) r d) d))))))
 ;;filter
 (define filter-leaves
   (lambda (tree pred)
