@@ -24,18 +24,18 @@
   (null? (branches t)))
 ;;a contract constructor for its labels
 (define (treeof element/c)
-  (define c (recursive-contract (cons/c element/c (listof c)) #:flat))
-  c)
+  (define c (cons/c element/c (recursive-contract (listof c)))) c)
 
 (module* representation-tests racket/base
-  (require rackunit (submod ".."))
+  (require racket/contract rackunit (submod ".."))
 
   (check-exn exn:fail:contract? (lambda () (tree 1 2 3)))
 
   (define t1 (tree 1))
   (define t2 (tree 2 t1))
 
-  (check-true ((treeof exact-positive-integer?) t2))
+  (check-not-exn (lambda () (contract (treeof exact-positive-integer?) t2 'pos 'neg)))
+  (check-exn exn:fail:contract? (lambda () (contract (treeof exact-positive-integer?) (tree "a") 'pos 'neg)))
   (check-true (and (tree? t1) (tree? t2) (leaf? t1) (not (leaf? t2))))
   (check-true (and (= 1 (label t1)) (= 2 (label t2))))
   (check-true (eq? t1 (car (branches t2)))))
