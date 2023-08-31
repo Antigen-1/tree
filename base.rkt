@@ -5,7 +5,9 @@
                        (branches (-> tree? any))
 
                        (tree? (-> any/c any))
-                       (leaf? (-> tree? any))))
+                       (leaf? (-> tree? any))
+
+                       (treeof (-> contract? any))))
 
 ;;the representation
 ;;the constructor and selectors
@@ -20,6 +22,10 @@
   (and (list? o) (not (null? o)) (andmap tree? (branches o))))
 (define (leaf? t)
   (null? (branches t)))
+;;a contract constructor for its labels
+(define (treeof element/c)
+  (define c (recursive-contract (cons/c element/c (listof c)) #:flat))
+  c)
 
 (module* representation-tests racket/base
   (require rackunit (submod ".."))
@@ -29,6 +35,7 @@
   (define t1 (tree 1))
   (define t2 (tree 2 t1))
 
+  (check-true ((treeof exact-positive-integer?) t2))
   (check-true (and (tree? t1) (tree? t2) (leaf? t1) (not (leaf? t2))))
   (check-true (and (= 1 (label t1)) (= 2 (label t2))))
   (check-true (eq? t1 (car (branches t2)))))
