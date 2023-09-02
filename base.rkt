@@ -42,8 +42,10 @@
   (check-true ((treeof exact-positive-integer?) t2))
   (check-false ((treeof exact-positive-integer?) (tree "a")))
   (check-exn exn:fail:contract? (lambda () ((treeof (-> any/c any)) add1)))
+
   ;;predicates
   (check-true (and (tree? t1) (tree? t2) (leaf? t1) (not (leaf? t2))))
+
   ;;selectors
   (check-true (and (= 1 (label t1)) (= 2 (label t2))))
   (check-true (eq? t1 (car (branches t2)))))

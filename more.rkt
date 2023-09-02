@@ -5,6 +5,8 @@
                        (fold/depth-first (-> (-> any/c any/c any) any/c tree? any))
                        (fold/breadth-first (-> (-> any/c any/c any) any/c tree? ... any))
 
+                       (map-tree (-> (-> any/c any/c) tree? any))
+
                        (count-nodes (-> tree? any))
                        (count-leaves (-> tree? any))
                        (count-levels (-> tree? any))
@@ -26,6 +28,10 @@
           proc
           (for/fold ((r init)) ((t (in-list trees))) (proc (label t) r))
           (append* (map branches trees))))))
+
+;;a transducer
+(define (map-tree proc tr)
+  (apply tree (proc (label tr)) (map (lambda (b) (map-tree proc b)) (branches tr))))
 
 ;;counters
 (define (count-nodes tree)
@@ -57,9 +63,12 @@
   (check-true (equal? (fold/depth-first (lambda (l i) (cons l i)) null t) '(4 3 2 1)))
   (let ((t1 (tree 5)))
     (check-true (equal? (fold/breadth-first (lambda (l i) (cons l i)) null t t1) '(3 4 2 5 1))))
+  ;;counters
   (check-true (= (count-nodes t) 4))
   (check-true (= (count-leaves t) 2))
   (check-true (= (count-levels t) 3))
+  ;;the transducer
+  (check-equal? (map-tree add1 t) (tree 2 (tree 3 (tree 4)) (tree 5)))
   ;;the logger
   (check-true (string=? (with-output-to-string (lambda () (print-tree t
                                                                       #:print (lambda (o) (display (format "&~a" o)))
